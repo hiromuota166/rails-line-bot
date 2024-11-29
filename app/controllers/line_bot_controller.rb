@@ -6,19 +6,19 @@ class LineBotController < ApplicationController
 
     logger.debug "Received signature: #{signature}"
 
+    if signature.nil?
+      logger.error "Signature is nil"
+      head :bad_request
+      return
+    end
+
     if !validate_signature(body, signature)
+      logger.error "Signature validation failed"
       head :bad_request
       return
     end
 
-    begin
-      events = JSON.parse(body)['events']
-    rescue JSON::ParserError => e
-      logger.error "JSON Parsing Error: #{e.message}"
-      head :bad_request
-      return
-    end
-
+    events = JSON.parse(body)['events']
     events.each do |event|
       case event['type']
       when 'message'
