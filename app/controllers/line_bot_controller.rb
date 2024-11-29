@@ -1,5 +1,4 @@
 class LineBotController < ApplicationController
-  protect_from_forgery with: :null_session
 
   def webhook
     body = request.body.read
