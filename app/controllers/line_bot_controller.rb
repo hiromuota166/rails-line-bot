@@ -1,3 +1,6 @@
+require 'net/http'
+require 'uri'
+
 class LineBotController < ApplicationController
 
   def webhook
