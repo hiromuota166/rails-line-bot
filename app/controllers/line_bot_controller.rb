@@ -24,7 +24,13 @@ class LineBotController < ApplicationController
     reply_token = event['replyToken']
 
     if message['type'] == 'text'
-      reply_message(reply_token, "You said: #{message['text']}")
+      text = message['text']
+      post = Post.create(title: text, content: text)
+      if post.persisted?
+        reply_message(reply_token, "新しい投稿を作成しました！\nTitle: #{post.title}\nContent: #{post.content}")
+      else
+        reply_message(reply_token, '投稿に失敗しました')
+      end
     end
   end
 
@@ -42,7 +48,5 @@ class LineBotController < ApplicationController
       replyToken: reply_token,
       messages: [{ type: 'text', text: text }]
     }.to_json
-
-    response = http.request(request)
   end
 end
