@@ -13,26 +13,22 @@ ENV RAILS_ENV="production" \
     BUNDLE_PATH="/usr/local/bundle" \
     BUNDLE_WITHOUT="development"
 
-
 # Throw-away build stage to reduce size of final image
 FROM base as build
 
 # Install packages needed to build gems
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libvips pkg-config
+    apt-get install --no-install-recommends -y \
+    build-essential \
+    git \
+    libpq-dev \
+    pkg-config
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
-
-RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends \
-    libpq-dev
-
 RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
-
-RUN bundle install
 
 # Copy application code
 COPY . .
@@ -40,14 +36,8 @@ COPY . .
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
 
-
 # Final stage for app image
 FROM base
-
-# # Install packages needed for deployment
-# RUN apt-get update -qq && \
-#     apt-get install --no-install-recommends -y curl libsqlite3-0 libvips && \
-#     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Copy built artifacts: gems, application
 COPY --from=build /usr/local/bundle /usr/local/bundle
