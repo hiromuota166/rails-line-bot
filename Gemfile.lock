@@ -217,7 +217,6 @@ DEPENDENCIES
   pg
   puma (>= 5.0)
   rails (~> 7.1.4, >= 7.1.4.2)
-  sqlite3 (>= 1.4)
   tzinfo-data
 
 RUBY VERSION
